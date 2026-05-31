@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Bookshelf</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --ink: #1a1814;
+        --paper: #f5f0e8;
+        --page: #faf7f2;
+        --line: #d9d3c5;
+        --muted: #8a8070;
+        --accent: #7a4f2e;
+        --accent-soft: #e8d9c8;
+        --read: #3a6644;
+        --read-soft: #d4e8da;
+        --want: #2a4a7a;
+        --want-soft: #d4dff0;
+        --tag-radius: 4px;
+      }
+
+      body {
+        background: var(--paper);
+        color: var(--ink);
+        font-family: "Lora", Georgia, serif;
+        min-height: 100vh;
+        padding: 0;
+      }
+
+      header {
+        background: var(--ink);
+        color: var(--paper);
+        padding: 2rem 2.5rem 1.8rem;
+        display: flex;
+        align-items: flex-end;
+        gap: 1.5rem;
+        justify-content: space-between;
+      }
+
+      header h1 {
+        font-size: 1.9rem;
+        font-weight: 600;
+        letter-spacing: -0.5px;
+        line-height: 1;
+      }
+
+      header p {
+        font-size: 0.8rem;
+        font-family: "DM Mono", monospace;
+        color: #a09888;
+        margin-top: 0.3rem;
+        letter-spacing: 0.05em;
+      }
+
+      .stats {
+        display: flex;
+        gap: 1.5rem;
+        font-family: "DM Mono", monospace;
+        font-size: 0.78rem;
+      }
+
+      .stat {
+        text-align: right;
+      }
+      .stat-num {
+        font-size: 1.4rem;
+        font-weight: 500;
+        color: var(--paper);
+        display: block;
+        line-height: 1;
+      }
+      .stat-label {
+        color: #8a8070;
+        margin-top: 2px;
+        display: block;
+      }
+
+      main {
+        max-width: 820px;
+        margin: 0 auto;
+        padding: 2rem 1.5rem 4rem;
+      }
+
+      .add-form {
+        background: var(--page);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 2.5rem;
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        align-items: flex-end;
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        flex: 1;
+        min-width: 160px;
+      }
+
+      .field label {
+        font-family: "DM Mono", monospace;
+        font-size: 0.7rem;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+        text-transform: uppercase;
+      }
+
+      input[type="text"] {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        padding: 0.55rem 0.75rem;
+        font-family: "Lora", serif;
+        font-size: 0.9rem;
+        color: var(--ink);
+        outline: none;
+        transition: border-color 0.15s;
+        width: 100%;
+      }
+
+      input[type="text"]:focus {
+        border-color: var(--accent);
+      }
+      input[type="text"]::placeholder {
+        color: #bbb5aa;
+      }
+
+      select {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        padding: 0.55rem 0.75rem;
+        font-family: "DM Mono", monospace;
+        font-size: 0.78rem;
+        color: var(--ink);
+        outline: none;
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238a8070'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        padding-right: 28px;
+      }
+
+      button.add-btn {
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        padding: 0.58rem 1.4rem;
+        font-family: "DM Mono", monospace;
+        font-size: 0.8rem;
+        letter-spacing: 0.04em;
+        cursor: pointer;
+        transition:
+          background 0.15s,
+          transform 0.1s;
+        white-space: nowrap;
+        align-self: flex-end;
+        margin-bottom: 0;
+      }
+
+      button.add-btn:hover {
+        background: #5e3a20;
+      }
+      button.add-btn:active {
+        transform: scale(0.97);
+      }
+
+      .section-label {
+        font-family: "DM Mono", monospace;
+        font-size: 0.72rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .section {
+        margin-bottom: 2.5rem;
+      }
+
+      .book-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+
+      .book-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--line);
+        animation: slideIn 0.2s ease;
+        position: relative;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .book-num {
+        font-family: "DM Mono", monospace;
+        font-size: 0.72rem;
+        color: var(--muted);
+        min-width: 24px;
+        text-align: right;
+      }
+
+      .book-title {
+        flex: 1;
+        font-size: 0.95rem;
+        color: var(--ink);
+        line-height: 1.4;
+      }
+
+      .book-author {
+        font-size: 0.82rem;
+        color: var(--muted);
+        font-style: italic;
+      }
+
+      .book-info {
+        flex: 1;
+      }
+
+      .tag {
+        font-family: "DM Mono", monospace;
+        font-size: 0.68rem;
+        letter-spacing: 0.04em;
+        padding: 2px 8px;
+        border-radius: var(--tag-radius);
+        white-space: nowrap;
+      }
+
+      .tag-read {
+        background: var(--read-soft);
+        color: var(--read);
+      }
+      .tag-want {
+        background: var(--want-soft);
+        color: var(--want);
+      }
+
+      .status-toggle {
+        background: none;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        padding: 2px 8px;
+        font-family: "DM Mono", monospace;
+        font-size: 0.68rem;
+        cursor: pointer;
+        color: var(--muted);
+        transition: all 0.15s;
+      }
+
+      .status-toggle:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      .del-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #ccc5b8;
+        font-size: 1.1rem;
+        line-height: 1;
+        padding: 2px 4px;
+        transition: color 0.15s;
+      }
+
+      .del-btn:hover {
+        color: #c0392b;
+      }
+
+      .empty {
+        font-size: 0.88rem;
+        color: var(--muted);
+        font-style: italic;
+        padding: 0.75rem 0;
+      }
+
+      .filter-bar {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+      }
+
+      .filter-btn {
+        background: none;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        padding: 4px 14px;
+        font-family: "DM Mono", monospace;
+        font-size: 0.72rem;
+        cursor: pointer;
+        color: var(--muted);
+        transition: all 0.12s;
+      }
+
+      .filter-btn.active {
+        background: var(--ink);
+        color: var(--paper);
+        border-color: var(--ink);
+      }
+      .filter-btn:hover:not(.active) {
+        border-color: var(--ink);
+        color: var(--ink);
+      }
+
+      @media (max-width: 520px) {
+        header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 1rem;
+        }
+        .stats {
+          gap: 1rem;
+        }
+        .stat {
+          text-align: left;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div>
+        <h1>My Bookshelf</h1>
+        <p>tracked locally · no account needed</p>
+      </div>
+      <div class="stats">
+        <div class="stat">
+          <span class="stat-num" id="stat-read">0</span
+          ><span class="stat-label">read</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num" id="stat-want">0</span
+          ><span class="stat-label">to read</span>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div class="add-form">
+        <div class="field" style="flex: 2; min-width: 200px">
+          <label for="input-title">Title</label>
+          <input
+            type="text"
+            id="input-title"
+            placeholder="e.g. The Name of the Wind"
+            autocomplete="off"
+          />
+        </div>
+        <div class="field" style="min-width: 130px">
+          <label for="input-author">Author</label>
+          <input
+            type="text"
+            id="input-author"
+            placeholder="optional"
+            autocomplete="off"
+          />
+        </div>
+        <div class="field" style="max-width: 130px; min-width: 110px">
+          <label for="input-status">Status</label>
+          <select id="input-status">
+            <option value="want">To read</option>
+            <option value="read">Read ✓</option>
+          </select>
+        </div>
+        <button class="add-btn" onclick="addBook()">+ Add book</button>
+      </div>
+
+      <div class="filter-bar">
+        <button class="filter-btn active" onclick="setFilter('all', this)">
+          All
+        </button>
+        <button class="filter-btn" onclick="setFilter('want', this)">
+          To read
+        </button>
+        <button class="filter-btn" onclick="setFilter('read', this)">
+          Read
+        </button>
+      </div>
+
+      <div id="book-list"></div>
+    </main>
+
+    <script>
+      let books = JSON.parse(localStorage.getItem("books") || "[]");
+      let filter = "all";
+
+      function save() {
+        localStorage.setItem("books", JSON.stringify(books));
+        updateStats();
+      }
+
+      function updateStats() {
+        document.getElementById("stat-read").textContent = books.filter(
+          (b) => b.status === "read",
+        ).length;
+        document.getElementById("stat-want").textContent = books.filter(
+          (b) => b.status === "want",
+        ).length;
+      }
+
+      function addBook() {
+        const title = document.getElementById("input-title").value.trim();
+        const author = document.getElementById("input-author").value.trim();
+        const status = document.getElementById("input-status").value;
+        if (!title) {
+          document.getElementById("input-title").focus();
+          return;
+        }
+        books.unshift({ id: Date.now(), title, author, status });
+        save();
+        render();
+        document.getElementById("input-title").value = "";
+        document.getElementById("input-author").value = "";
+        document.getElementById("input-title").focus();
+      }
+
+      function deleteBook(id) {
+        books = books.filter((b) => b.id !== id);
+        save();
+        render();
+      }
+
+      function toggleStatus(id) {
+        const b = books.find((b) => b.id === id);
+        if (b) {
+          b.status = b.status === "read" ? "want" : "read";
+        }
+        save();
+        render();
+      }
+
+      function setFilter(f, btn) {
+        filter = f;
+        document
+          .querySelectorAll(".filter-btn")
+          .forEach((el) => el.classList.remove("active"));
+        btn.classList.add("active");
+        render();
+      }
+
+      function render() {
+        const list = document.getElementById("book-list");
+        const visible =
+          filter === "all" ? books : books.filter((b) => b.status === filter);
+
+        if (!visible.length) {
+          list.innerHTML =
+            '<p class="empty">No books here yet — add one above.</p>';
+          return;
+        }
+
+        list.innerHTML =
+          '<div class="book-list">' +
+          visible
+            .map(
+              (b, i) => `
+      <div class="book-item">
+        <span class="book-num">${String(i + 1).padStart(2, "0")}</span>
+        <div class="book-info">
+          <div class="book-title">${escHtml(b.title)}</div>
+          ${b.author ? `<div class="book-author">${escHtml(b.author)}</div>` : ""}
+        </div>
+        <span class="tag tag-${b.status}">${b.status === "read" ? "read" : "to read"}</span>
+        <button class="status-toggle" onclick="toggleStatus(${b.id})" title="Toggle status">
+          ${b.status === "read" ? "↩ unread" : "✓ done"}
+        </button>
+        <button class="del-btn" onclick="deleteBook(${b.id})" title="Remove">×</button>
+      </div>
+    `,
+            )
+            .join("") +
+          "</div>";
+      }
+
+      function escHtml(str) {
+        return str
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      document
+        .getElementById("input-title")
+        .addEventListener("keydown", (e) => {
+          if (e.key === "Enter") addBook();
+        });
+
+      updateStats();
+      render();
+    </script>
+  </body>
+</html>
